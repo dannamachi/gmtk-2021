@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D body;
     float hori;
     float vert;
+    Vector2 lookDir = new Vector2(1,0);
 
     // Start is called before the first frame update (not called when instantiate)
     void Start()
@@ -22,6 +23,18 @@ public class PlayerController : MonoBehaviour
     {
         hori = Input.GetAxis("Horizontal");
         vert = Input.GetAxis("Vertical");
+
+        Vector2 move = new Vector2(hori, vert);
+                
+        if(!Mathf.Approximately(move.x, 0.0f) || !Mathf.Approximately(move.y, 0.0f))
+        {
+            lookDir.Set(move.x, move.y);
+            lookDir.Normalize();
+        }
+                
+        anim.SetFloat("Look X", lookDir.x);
+        anim.SetFloat("Look Y", lookDir.y);
+        anim.SetFloat("Speed", move.magnitude);
     }
 
     // Update for physics
