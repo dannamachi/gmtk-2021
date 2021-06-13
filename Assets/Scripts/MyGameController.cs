@@ -153,6 +153,7 @@ public class MyGameController : MonoBehaviour
             mapSlot[vec] = false;
         }
         Debug.Log(debugDisplayMap(currentMap));
+        Debug.Log(debugDisplayMap(correctMap));
     }
     public void postPutDownCheckSlot(PieceController piece)
     {        
@@ -176,15 +177,16 @@ public class MyGameController : MonoBehaviour
             mapSlot[vecen] = true;
         }
         Debug.Log(debugDisplayMap(currentMap));
+        Debug.Log(debugDisplayMap(correctMap));
     }
     string debugDisplayMap(string[,] map)
     {
-        string sth = "";
+        string sth = "Map?:\n";
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < 4; j++)
             {
-                sth += i.ToString() + "-" + j.ToString() + ":" + map[i,j] + ",";
+                sth += i.ToString() + "-" + j.ToString() + ":" + map[i,j] + "\n";
             }
         }
         return sth;
