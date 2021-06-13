@@ -107,10 +107,11 @@ public class PlayerController : MonoBehaviour
     // Update for physics
     void FixedUpdate() 
     {
+        // make sure player not out of bounds
         Vector2 pos = body.position;
-        pos.x += 3.0f * hori * Time.deltaTime;
-        pos.y += 3.0f * vert * Time.deltaTime;
-
+        pos.x = Mathf.Clamp(pos.x + 3.0f * hori * Time.deltaTime, -4.5f, 4.5f);
+        pos.y = Mathf.Clamp(pos.y + 3.0f * vert * Time.deltaTime, -4.5f, 4.5f);
+        // move player
         body.MovePosition(pos);
     }
 }
