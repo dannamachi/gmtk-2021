@@ -1,15 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    //variable
+    // movement stuff
     Animator anim;
     Rigidbody2D body;
     float hori;
     float vert;
     Vector2 lookDir = new Vector2(1,0);
+
+    // item stuff
+    public GameObject itemDisplayObj;
+    GameObject pieceDetected;
+    GameObject pieceInHand;
+
+    // game ref
+    public GameObject gameObj;
 
     // Start is called before the first frame update (not called when instantiate)
     void Start()
@@ -21,6 +30,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // movement & movement animation
         hori = Input.GetAxis("Horizontal");
         vert = Input.GetAxis("Vertical");
 
@@ -35,6 +45,63 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("Look X", lookDir.x);
         anim.SetFloat("Look Y", lookDir.y);
         anim.SetFloat("Speed", move.magnitude);
+
+        // pick up piece
+        if(Input.GetKeyDown(KeyCode.Z))
+        {
+            pickUp();
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            putDown();
+        }
+    }
+
+    // pick up piece
+    void pickUp()
+    {
+        if (pieceDetected != null && !hasPickUp())
+        {
+            // update holding sprite
+            pieceInHand = pieceDetected;
+            PieceController myPiece = pieceInHand.GetComponent<PieceController>();
+            itemDisplayObj.GetComponent<Image>().sprite = myPiece.getSprite();
+            // hide item
+            myPiece.hide();
+            // unsnap from map slot if any
+            gameObj.GetComponent<MyGameController>().postPickUpCheckSlot(myPiece);
+        }
+    }
+    void putDown()
+    {
+        if (hasPickUp())
+        {
+            // update holding sprite
+            PieceController myPiece = pieceInHand.GetComponent<PieceController>();
+            itemDisplayObj.GetComponent<Image>().sprite = null;
+            myPiece.setLocation(transform.position);
+            // show placed item
+            myPiece.show();
+            // remove item ref
+            pieceInHand = null;
+            // snap into map slot if any
+            gameObj.GetComponent<MyGameController>().postPutDownCheckSlot(myPiece);
+        }
+    }
+    bool hasPickUp()
+    {
+        return pieceInHand != null;
+    }
+    public void detectPiece(GameObject obj)
+    {
+        pieceDetected = obj;
+    }
+    public void escapePiece(GameObject obj)
+    {
+        if (pieceDetected == obj)
+        {
+            pieceDetected = null;
+        }
     }
 
     // Update for physics

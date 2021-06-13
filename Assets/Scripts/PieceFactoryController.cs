@@ -8,33 +8,26 @@ public class PieceFactoryController : MonoBehaviour
     public List<Sprite> citybros = new List<Sprite>();
     public List<Sprite> evergreens = new List<Sprite>();
     public List<Sprite> gayhearts = new List<Sprite>();
+    string picRef;
     // Piece Ref
     public GameObject piecePrefab;
 
-    // Connection matrix lmao
-    int getConn4(int pos, string dirKey)
+    // Correct map
+    public int[,] getCorrectMap4()
     {
-        if (dirKey.Equals("trueLeft"))
+        int[,] corrMap = new int[4,4];
+        for (int i = 0; i < 4; i++)
         {
-            if (pos % 4 == 0) return -1;
-            return pos - 1;
+            for (int j = 0; j < 4; j++)
+            {
+                corrMap[i, j] = i * 4 + j;
+            }
         }
-        else if (dirKey.Equals("trueRight"))
-        {
-            if (pos % 4 == 3) return -1;
-            return pos + 1;
-        }
-        else if (dirKey.Equals("trueUp"))
-        {
-            if (pos / 4 == 0) return -1;
-            return pos - 4;
-        }
-        else if (dirKey.Equals("trueDown"))
-        {
-            if (pos / 4 == 3) return -1;
-            return pos + 4;
-        }
-        return -2;
+        return corrMap;
+    }
+    public string getPicRef()
+    {
+        return picRef;
     }
 
     // Start is called before the first frame update
@@ -51,6 +44,7 @@ public class PieceFactoryController : MonoBehaviour
         List<Sprite> spriteList = new List<Sprite>();
         int ran = Random.Range(0, 3);
         string titlePiece = "NA";
+        picRef = titlePiece;
         switch(ran)
         {
             case 0:
@@ -74,11 +68,6 @@ public class PieceFactoryController : MonoBehaviour
                 GameObject gam = Instantiate(piecePrefab, new Vector2(), Quaternion.identity);
                 PieceController piece = gam.GetComponent<PieceController>();
                 piece.changeSprite(citybros[i], titlePiece + i.ToString());
-                // 4 directions
-                if (getConn4(i, "trueLeft") > 0) piece.setTrueConn("trueLeft", titlePiece + getConn4(i, "trueLeft").ToString());
-                if (getConn4(i, "trueRight") > 0) piece.setTrueConn("trueRight", titlePiece + getConn4(i, "trueRight").ToString());
-                if (getConn4(i, "trueUp") > 0) piece.setTrueConn("trueUp", titlePiece + getConn4(i, "trueUp").ToString());
-                if (getConn4(i, "trueDown") > 0) piece.setTrueConn("trueDown", titlePiece + getConn4(i, "trueDown").ToString());
                 // add to list
                 pieces.Add(gam);
             }        

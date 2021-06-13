@@ -8,13 +8,28 @@ public class PieceController : MonoBehaviour
     bool myEnabled = false;
     // Connections
     string myName;
-    Dictionary<string, string> connDict = new Dictionary<string, string>();
 
     // Start is called when instant
     void Awake()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
+    }
+
+    // Piece id
+    public string getName()
+    {
+        return myName;
+    }
+    public bool isCalled(string sth)
+    {
+        return myName.Equals(sth);
+    }
+
+    // Get sprite for item display
+    public Sprite getSprite()
+    {
+        return spriteRenderer.sprite;
     }
 
     // Set location
@@ -27,79 +42,24 @@ public class PieceController : MonoBehaviour
     public void enable()
     {
         myEnabled = true;
-        spriteRenderer.enabled = true;
+        show();
     }
     public void disable()
     {
         myEnabled = false;
-        spriteRenderer.enabled = false;
+        hide();
     }
     public bool isEnabled()
     {
         return myEnabled;
     }
-
-    // Check conn
-    public bool isConnected(string key = "any") {
-        if (!key.Equals("any"))
-        {
-            return connDict.ContainsKey(key);
-        }
-        else
-        {
-            return connDict.ContainsKey("left") || connDict.ContainsKey("right") || connDict.ContainsKey("up") || connDict.ContainsKey("down");
-        }
-    }
-    public bool isPlacedCorrectly()
+    public void hide()
     {
-        if (connDict.ContainsKey("trueLeft"))
-        {
-            if (connDict.ContainsKey("left"))
-            {
-                if (!connDict["trueLeft"].Equals(connDict["left"])) return false;
-            } else return false;
-                
-        }
-        if (connDict.ContainsKey("trueRight"))
-        {
-            if (connDict.ContainsKey("right"))
-            {
-                if (connDict["trueRight"].Equals(connDict["right"])) return false;
-            } else return false;
-        }
-        if (connDict.ContainsKey("trueUp"))
-        {
-            if (connDict.ContainsKey("up"))
-            {
-                if (connDict["trueUp"].Equals(connDict["up"])) return false;
-            } else return false;
-        }
-        if (connDict.ContainsKey("trueDown"))
-        {
-            if (connDict.ContainsKey("down"))
-            {
-                if (connDict["trueDown"].Equals(connDict["down"])) return false;
-            } else return false;
-        }
-        return true;
+        spriteRenderer.enabled = false;
     }
-
-    // Set correct conn
-    public void setTrueConn(string dirKey, string connName)
+    public void show()
     {
-        connDict.Add(dirKey, connName);
-    }
-
-    // Set conn
-    public void setConn(string dirKey, string connName)
-    {
-        if (myEnabled)
-            connDict.Add(dirKey, connName);
-    }
-    public void removeConn(string dirKey)
-    {
-        if (myEnabled)
-            if (connDict.ContainsKey(dirKey)) connDict.Remove(dirKey);
+        spriteRenderer.enabled = true;
     }
 
     // Change sprite
@@ -109,9 +69,36 @@ public class PieceController : MonoBehaviour
         myName = text;
     }
 
-    // Update is called once per frame
+    // On collision with other stuff
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // if player hits a piece
+        PlayerController player = other.GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.detectPiece(gameObject);
+            return;
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        // if player leaves a piece
+        PlayerController player = other.GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.escapePiece(gameObject);
+            return;
+        }
+    }
+
+    // check & update connection in update
     void Update()
     {
         
+    }
+    public Vector2 getMyPos()
+    {
+        Vector2 myPos = transform.position;
+        return myPos;
     }
 }
