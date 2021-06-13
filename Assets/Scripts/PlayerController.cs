@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
             // hide item
             myPiece.hide();
             // unsnap from map slot if any
-            gameObj.GetComponent<MyGameController>().checkSlotSnapping(myPiece);
+            gameObj.GetComponent<MyGameController>().postPickUpCheckSlot(myPiece);
         }
     }
     void putDown()
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
             // remove item ref
             pieceInHand = null;
             // snap into map slot if any
-            gameObj.GetComponent<MyGameController>().checkSlotSnapping(myPiece);
+            gameObj.GetComponent<MyGameController>().postPutDownCheckSlot(myPiece);
         }
     }
     bool hasPickUp()

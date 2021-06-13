@@ -108,31 +108,69 @@ public class MyGameController : MonoBehaviour
         releaseTime = intervalTime;
         isStart = true;
     }
-    public void checkSlotSnapping(PieceController piece)
-    {        
+    public void postPickUpCheckSlot(PieceController piece)
+    {
+        List<Vector2> disSlots = new List<Vector2>();
         foreach (KeyValuePair<Vector2, bool> entry in mapSlot)
         {
             // distance to each slotted point
             if (entry.Value)
             {
-                if (Vector2.Distance(entry.Key, piece.getMyPos()) >= 0.4)
+                if (isPieceSlottedHere(entry.Key, piece.getName()))
                 {
                     // remove slot entry
-                    mapSlot[entry.Key] = false;
+                    disSlots.Add(entry.Key);
                     unfillCurrentMap(entry.Key);
+                    break;
                 }
             }
+        }
+        // disable
+        foreach (Vector2 vec in disSlots)
+        {
+            mapSlot[vec] = false;
+        }
+        Debug.Log(debugDisplayMap(currentMap));
+    }
+    public void postPutDownCheckSlot(PieceController piece)
+    {        
+        List<Vector2> enSlots = new List<Vector2>();
+        foreach (KeyValuePair<Vector2, bool> entry in mapSlot)
+        {
             // distance to each unslotted slot point
-            else if (Vector2.Distance(entry.Key, piece.getMyPos()) <= 0.4)
+            if (!entry.Value && Vector2.Distance(entry.Key, piece.getMyPos()) <= 0.4)
             {
                 // snap!
                 piece.setLocation(entry.Key);
                 // fill up slot
-                mapSlot[entry.Key] = true;
+                enSlots.Add(entry.Key);
                 fillCurrentMap(entry.Key, piece.getName());
+                break;
             }
         }
-        Debug.Log(currentMap.ToString());
+        // enable slots
+        foreach (Vector2 vecen in enSlots)
+        {
+            mapSlot[vecen] = true;
+        }
+        Debug.Log(debugDisplayMap(currentMap));
+    }
+    string debugDisplayMap(string[,] map)
+    {
+        string sth = "";
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                sth += i.ToString() + "-" + j.ToString() + ":" + map[i,j] + ",";
+            }
+        }
+        return sth;
+    }
+    bool isPieceSlottedHere(Vector2 slotKey, string pieceName)
+    {
+        int[] matrixCoord = slotDict[slotKey];
+        return currentMap[matrixCoord[0], matrixCoord[1]] == pieceName;
     }
     void fillCurrentMap(Vector2 slotPos, string content)
     {
