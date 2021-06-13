@@ -43,7 +43,7 @@ public class MyGameController : MonoBehaviour
     
     // bomb timer
     float bombTime;
-    public float bombInterval = 10.0f;
+    public float bombInterval = 15.0f;
 
     // piece timer stuff
     float releaseTime;
@@ -60,6 +60,7 @@ public class MyGameController : MonoBehaviour
         // hide safe zone
         SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
         szone.setDisplay(false);
+        szone.setEnabled(false);
         // display main
         displayOverlay("Main");
         displayButton("Start");
@@ -201,6 +202,7 @@ public class MyGameController : MonoBehaviour
                     {
                         SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
                         szone.setDisplay(true);
+                        szone.setEnabled(true);
                     }
                 }
                 else
@@ -220,6 +222,7 @@ public class MyGameController : MonoBehaviour
                     // hide safe zone
                     SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
                     szone.setDisplay(false);
+                    szone.setEnabled(false);
                     // prepare next random safe zone location (+boundary)
                     float newX = Random.Range(-3.0f, 3.0f);
                     float newY;
@@ -228,6 +231,8 @@ public class MyGameController : MonoBehaviour
                     szone.setLocation(new Vector2(newX, newY));
                     // restart bomb timer
                     bombTime = bombInterval;
+                    // reset safety
+                    player.setSafe(false);
                 }
             }
         }
