@@ -8,6 +8,17 @@ public class PieceFactoryController : MonoBehaviour
     public List<Sprite> citybros = new List<Sprite>();
     public List<Sprite> evergreens = new List<Sprite>();
     public List<Sprite> gayhearts = new List<Sprite>();
+    public List<Sprite> foxrest = new List<Sprite>();
+    public List<Sprite> lifegony = new List<Sprite>();
+    public List<Sprite> braziliant = new List<Sprite>();
+    public List<Sprite> reddersky = new List<Sprite>();
+    public Sprite citybro;
+    public Sprite evergreen;
+    public Sprite gayheart;
+    public Sprite foxres;
+    public Sprite lifegon;
+    public Sprite brazilia;
+    public Sprite redder;
     string picRef;
     // Piece Ref
     public GameObject piecePrefab;
@@ -36,13 +47,26 @@ public class PieceFactoryController : MonoBehaviour
         
     }
 
+    // get display piece
+    public Sprite getDisplayPiece()
+    {
+        if (picRef.Equals("CityBro")) return citybro;
+        else if (picRef.Equals("EverGreen")) return evergreen;
+        else if (picRef.Equals("GayHeart")) return gayheart;
+        else if (picRef.Equals("Foxrest")) return foxres;
+        else if (picRef.Equals("Lifegony")) return lifegon;
+        else if (picRef.Equals("Braziliant")) return brazilia;
+        else if (picRef.Equals("RedderSky")) return redder;
+        return null;
+    }
+
     // create pieces
     public List<GameObject> createPieceList()
     {
         // select random image
         List<GameObject> pieces = new List<GameObject>();
         List<Sprite> spriteList = new List<Sprite>();
-        int ran = Random.Range(0, 3);
+        int ran = Random.Range(0, 7);
         string titlePiece = "NA";
         switch(ran)
         {
@@ -57,6 +81,22 @@ public class PieceFactoryController : MonoBehaviour
             case 2:
                 titlePiece = "GayHeart";
                 spriteList = gayhearts;
+                break;
+            case 3:
+                titlePiece = "Foxrest";
+                spriteList = foxrest;
+                break;
+            case 4:
+                titlePiece = "Lifegony";
+                spriteList = lifegony;
+                break;
+            case 5:
+                titlePiece = "Braziliant";
+                spriteList = braziliant;
+                break;
+            case 6:
+                titlePiece = "RedderSky";
+                spriteList = reddersky;
                 break;
         }
         picRef = titlePiece;
