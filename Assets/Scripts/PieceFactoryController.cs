@@ -67,7 +67,7 @@ public class PieceFactoryController : MonoBehaviour
                 // instantiate w sprite
                 GameObject gam = Instantiate(piecePrefab, new Vector2(), Quaternion.identity);
                 PieceController piece = gam.GetComponent<PieceController>();
-                piece.changeSprite(citybros[i], titlePiece + i.ToString());
+                piece.changeSprite(spriteList[i], titlePiece + i.ToString());
                 // add to list
                 pieces.Add(gam);
             }        
