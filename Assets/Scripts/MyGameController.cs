@@ -121,7 +121,8 @@ public class MyGameController : MonoBehaviour
     public void onButton2Press()
     {
         // exit code
-        Debug.Log("Game closed.");
+        // Debug.Log("Exit");
+        Application.Quit();
     }
 
     // Update is called once per frame
@@ -255,8 +256,8 @@ public class MyGameController : MonoBehaviour
         {
             mapSlot[vec] = false;
         }
-        Debug.Log(debugDisplayMap(currentMap));
-        Debug.Log(debugDisplayMap(correctMap));
+        // Debug.Log(debugDisplayMap(currentMap));
+        // Debug.Log(debugDisplayMap(correctMap));
     }
     public void postPutDownCheckSlot(PieceController piece)
     {        
@@ -279,8 +280,8 @@ public class MyGameController : MonoBehaviour
         {
             mapSlot[vecen] = true;
         }
-        Debug.Log(debugDisplayMap(currentMap));
-        Debug.Log(debugDisplayMap(correctMap));
+        // Debug.Log(debugDisplayMap(currentMap));
+        // Debug.Log(debugDisplayMap(correctMap));
     }
     string debugDisplayMap(string[,] map)
     {
