@@ -12,6 +12,8 @@ public class MyGameController : MonoBehaviour
     public GameObject timerTextObj;
     public GameObject frameObj;
     public GameObject overlayObj;
+    public GameObject safeZoneObj;
+    public GameObject bombObj;
 
     // buttons & overlays
     public Sprite mainSp;
@@ -38,7 +40,11 @@ public class MyGameController : MonoBehaviour
 
     // game timer
     float gameTime;
-    float gameMaxTime = 300.0f;
+    public float gameMaxTime = 300.0f;
+    
+    // bomb timer
+    float bombTime;
+    public float bombInterval = 15.0f;
 
     // piece timer stuff
     float releaseTime;
@@ -52,6 +58,12 @@ public class MyGameController : MonoBehaviour
         isStart = false;
         // hide pic background
         picBG.GetComponent<SpriteRenderer>().enabled = false;
+        // hide safe zone
+        SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
+        szone.setDisplay(false);
+        szone.setEnabled(false);
+        // hide bomb
+        bombObj.SetActive(false);
         // display main
         displayOverlay("Main");
         displayButton("Start");
@@ -134,6 +146,7 @@ public class MyGameController : MonoBehaviour
             timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Time left: " + ((int) gameTime).ToString();
             // check win
             isWin = isPictureFinished();
+            
             // game timer
             if (gameTime > 0.0f && !isWin) gameTime -= Time.deltaTime;
             else
@@ -147,7 +160,9 @@ public class MyGameController : MonoBehaviour
                 else displayOverlay("GameOver");
                 displayButton("Restart");
                 displayButton("Exit");
+                bombObj.SetActive(false);
             }
+            
             // piece generation
             if (isStart && !allEnabled())
             {
@@ -179,6 +194,53 @@ public class MyGameController : MonoBehaviour
                 }
             }
             
+            // bomb generation
+            if (isStart)
+            {
+                // give 2s of leeway
+                if (bombTime > 0.0f)
+                {
+                    bombTime -= Time.deltaTime;
+                    // warning sound & show safe zone
+                    if (bombTime < bombInterval / 2)
+                    {
+                        SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
+                        szone.setDisplay(true);
+                        szone.setEnabled(true);
+                    }
+                }
+                else
+                {
+                    // check safe, otherwise explode!
+                    PlayerController player = playerObj.GetComponent<PlayerController>();
+                    if (!player.isSafe())
+                    {
+                        // play bomb ani
+                        Animator bombAnima = bombObj.GetComponent<Animator>();
+                        bombAnima.SetTrigger("Explode");
+                        // mix up slotted pieces!
+                        wreckMap(getFilledInSlots() / 2);
+                    }
+                    else 
+                    {
+                        // play safe sound
+                    }
+                    // hide safe zone
+                    SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
+                    szone.setDisplay(false);
+                    szone.setEnabled(false);
+                    // prepare next random safe zone location (+boundary)
+                    float newX = Random.Range(-4.0f, 4.0f);
+                    float newY;
+                    if (newX > 3.0f) newY = Random.Range(-3.0f, 4.0f);
+                    else newY = Random.Range(-4.0f, 4.0f);
+                    szone.setLocation(new Vector2(newX, newY));
+                    // restart bomb timer
+                    bombTime = bombInterval;
+                    // reset safety
+                    player.setSafe(false);
+                }
+            }
         }
         // end state
         else 
@@ -194,6 +256,81 @@ public class MyGameController : MonoBehaviour
             if (!(obj.GetComponent<PieceController>().isEnabled())) return false;
         }
         return true;
+    }
+
+    // bomb methods
+    int getFilledInSlots()
+    {
+        // count non NA slot
+        int count = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (!(currentMap[i, j].Equals("NA"))) count++;
+            }
+        }
+        return count;
+    }
+    void wreckMap(int num)
+    {
+        for (int i = 0; i < num; i++)
+        {
+            // get 2 random slots
+            int rand1 = Random.Range(0, 16);
+            int rand2 = Random.Range(0, 16);
+            List<Vector2> slots = new List<Vector2>(mapSlot.Keys);
+            Vector2 slot1 = slots[rand1];
+            Vector2 slot2 = slots[rand2];
+            // if not NA, swap them
+            bool not1 = isPieceSlottedHere(slot1, "NA");
+            bool not2 = isPieceSlottedHere(slot2, "NA");
+            // filled slot 1, empty slot 2
+            if (!not1 && not2)
+            {
+                // fill slot 2
+                mapSlot[slot2] = true;
+                fillCurrentMap(slot2, whatIsSlottedHere(slot1));
+                // empty slot 1
+                mapSlot[slot1] = false;
+                unfillCurrentMap(slot1);
+                // relocate piece
+                getPieceWithName(whatIsSlottedHere(slot2)).setLocation(slot2);
+            }
+            // empty slot 1, filled slot 2
+            else if (not1 && !not2)
+            {
+                // fill slot 1
+                mapSlot[slot1] = true;
+                fillCurrentMap(slot1, whatIsSlottedHere(slot2));
+                // empty slot 2
+                mapSlot[slot2] = false;
+                unfillCurrentMap(slot2);
+                // relocate piece
+                getPieceWithName(whatIsSlottedHere(slot1)).setLocation(slot1);
+            }
+            // both slots fillted
+            else if (!not1 && !not2)
+            {
+                // temp fill for slot 1
+                string tempFill = whatIsSlottedHere(slot1);
+                // fill slot 1
+                fillCurrentMap(slot1, whatIsSlottedHere(slot2));
+                // fill slot 2
+                fillCurrentMap(slot2, tempFill);
+                // relocate both pieces
+                getPieceWithName(whatIsSlottedHere(slot1)).setLocation(slot1);
+                getPieceWithName(whatIsSlottedHere(slot2)).setLocation(slot2);
+            }
+        }
+    }
+    PieceController getPieceWithName(string pname)
+    {
+        foreach (GameObject piece in pieceObjs)
+        {
+            if (piece.GetComponent<PieceController>().isCalled(pname)) return piece.GetComponent<PieceController>();
+        }
+        return null;
     }
 
     // game methods
@@ -233,6 +370,10 @@ public class MyGameController : MonoBehaviour
         gameTime = gameMaxTime;
         isStart = true;
         isWin = false;
+
+        // bomb stuff
+        bombObj.SetActive(true);
+        bombTime = bombInterval;
     }
     public void postPickUpCheckSlot(PieceController piece)
     {
@@ -299,6 +440,11 @@ public class MyGameController : MonoBehaviour
     {
         int[] matrixCoord = slotDict[slotKey];
         return currentMap[matrixCoord[0], matrixCoord[1]] == pieceName;
+    }
+    string whatIsSlottedHere(Vector2 slotKey)
+    {
+        int[] matrixCoord = slotDict[slotKey];
+        return currentMap[matrixCoord[0], matrixCoord[1]];
     }
     void fillCurrentMap(Vector2 slotPos, string content)
     {

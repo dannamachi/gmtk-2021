@@ -17,6 +17,12 @@ public class PlayerController : MonoBehaviour
     GameObject pieceDetected;
     GameObject pieceInHand;
 
+    // bomb stuff
+    bool safed = false;
+
+    public bool isSafe() { return safed; }
+    public void setSafe(bool saf) { safed = saf; }
+
     // game ref
     public GameObject gameObj;
 
