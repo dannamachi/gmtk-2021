@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     GameObject pieceDetected;
     GameObject pieceInHand;
 
+    // game ref
+    public GameObject gameObj;
+
     // Start is called before the first frame update (not called when instantiate)
     void Start()
     {
@@ -57,22 +60,32 @@ public class PlayerController : MonoBehaviour
     // pick up piece
     void pickUp()
     {
-        if (pieceDetected != null)
+        if (pieceDetected != null && !hasPickUp())
         {
+            // update holding sprite
             pieceInHand = pieceDetected;
             PieceController myPiece = pieceInHand.GetComponent<PieceController>();
             itemDisplayObj.GetComponent<Image>().sprite = myPiece.getSprite();
+            // hide item
             myPiece.hide();
+            // unsnap from map slot if any
+            gameObj.GetComponent<MyGameController>().checkSlotSnapping(myPiece);
         }
     }
     void putDown()
     {
         if (hasPickUp())
         {
+            // update holding sprite
             PieceController myPiece = pieceInHand.GetComponent<PieceController>();
             itemDisplayObj.GetComponent<Image>().sprite = null;
             myPiece.setLocation(transform.position);
+            // show placed item
             myPiece.show();
+            // remove item ref
+            pieceInHand = null;
+            // snap into map slot if any
+            gameObj.GetComponent<MyGameController>().checkSlotSnapping(myPiece);
         }
     }
     bool hasPickUp()
