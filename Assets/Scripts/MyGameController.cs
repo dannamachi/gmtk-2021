@@ -17,8 +17,13 @@ public class MyGameController : MonoBehaviour
 
     // game states
     bool isStart;
+    bool isWin;
 
-    // timer stuff
+    // game timer
+    float gameTime;
+    float gameMaxTime = 300.0f;
+
+    // piece timer stuff
     float releaseTime;
     public float intervalTime = 5.0f;
     string timerText;
@@ -34,40 +39,55 @@ public class MyGameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // terminate piece gen if no more
-        if (!allEnabled() && isStart)
+        if (isStart)
         {
-            // piece generation timer
-            timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Time: " + ((int) releaseTime).ToString();
-            if (releaseTime > 0.0f)
-            {
-                releaseTime -= Time.deltaTime;
-            }
+            timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Time left: " + ((int) gameTime).ToString();
+            // check win
+            isWin = isPictureFinished();
+            // game timer
+            if (gameTime > 0.0f && !isWin) gameTime -= Time.deltaTime;
             else
             {
-                releaseTime = intervalTime;
-                // display a new sprite, 4x4
-                int newOther = Random.Range(0, 16);
-                PieceController newPiece = pieceObjs[newOther].GetComponent<PieceController>();
-                while (newPiece.isEnabled())
-                {
-                    newOther = Random.Range(0, 16);
-                    newPiece = pieceObjs[newOther].GetComponent<PieceController>();
-                }
-                newPiece.enable();
-
-                // randomize location on screen
-                float newX = Random.Range(-4.0f, 4.0f);
-                float newY;
-                if (newX > 3.0f) newY = Random.Range(-3.0f, 4.0f);
-                else newY = Random.Range(-4.0f, 4.0f);
-
-                newPiece.setLocation(new Vector2(newX, newY));
+                // game ends
+                gameTime = gameMaxTime;
+                isStart = false;
             }
+            // piece generation
+            if (isStart && !allEnabled())
+            {
+                // piece generation timer
+                if (releaseTime > 0.0f)
+                {
+                    releaseTime -= Time.deltaTime;
+                }
+                else
+                {
+                    releaseTime = intervalTime;
+                    // display a new sprite, 4x4
+                    int newOther = Random.Range(0, 16);
+                    PieceController newPiece = pieceObjs[newOther].GetComponent<PieceController>();
+                    while (newPiece.isEnabled())
+                    {
+                        newOther = Random.Range(0, 16);
+                        newPiece = pieceObjs[newOther].GetComponent<PieceController>();
+                    }
+                    newPiece.enable();
+
+                    // randomize location on screen
+                    float newX = Random.Range(-4.0f, 4.0f);
+                    float newY;
+                    if (newX > 3.0f) newY = Random.Range(-3.0f, 4.0f);
+                    else newY = Random.Range(-4.0f, 4.0f);
+
+                    newPiece.setLocation(new Vector2(newX, newY));
+                }
+            }
+            
         }
         else 
         {
-            timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Game Not Started";
+            if (isWin) timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Game Won!";
+            else timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Game Not Won!";
         }
     }
     bool allEnabled()
@@ -106,7 +126,9 @@ public class MyGameController : MonoBehaviour
 
         // timer stuff
         releaseTime = intervalTime;
+        gameTime = gameMaxTime;
         isStart = true;
+        isWin = false;
     }
     public void postPickUpCheckSlot(PieceController piece)
     {
@@ -131,6 +153,7 @@ public class MyGameController : MonoBehaviour
             mapSlot[vec] = false;
         }
         Debug.Log(debugDisplayMap(currentMap));
+        Debug.Log(debugDisplayMap(correctMap));
     }
     public void postPutDownCheckSlot(PieceController piece)
     {        
@@ -154,15 +177,16 @@ public class MyGameController : MonoBehaviour
             mapSlot[vecen] = true;
         }
         Debug.Log(debugDisplayMap(currentMap));
+        Debug.Log(debugDisplayMap(correctMap));
     }
     string debugDisplayMap(string[,] map)
     {
-        string sth = "";
+        string sth = "Map?:\n";
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < 4; j++)
             {
-                sth += i.ToString() + "-" + j.ToString() + ":" + map[i,j] + ",";
+                sth += i.ToString() + "-" + j.ToString() + ":" + map[i,j] + "\n";
             }
         }
         return sth;

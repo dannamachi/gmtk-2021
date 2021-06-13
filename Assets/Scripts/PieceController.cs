@@ -72,22 +72,28 @@ public class PieceController : MonoBehaviour
     // On collision with other stuff
     void OnTriggerEnter2D(Collider2D other)
     {
-        // if player hits a piece
-        PlayerController player = other.GetComponent<PlayerController>();
-        if (player != null)
+        if (isEnabled())
         {
-            player.detectPiece(gameObject);
-            return;
+            // if player hits a piece
+            PlayerController player = other.GetComponent<PlayerController>();
+            if (player != null)
+            {
+                player.detectPiece(gameObject);
+                return;
+            }
         }
     }
     void OnTriggerExit2D(Collider2D other)
     {
-        // if player leaves a piece
-        PlayerController player = other.GetComponent<PlayerController>();
-        if (player != null)
+        if (isEnabled())
         {
-            player.escapePiece(gameObject);
-            return;
+            // if player leaves a piece
+            PlayerController player = other.GetComponent<PlayerController>();
+            if (player != null)
+            {
+                player.escapePiece(gameObject);
+                return;
+            }
         }
     }
 

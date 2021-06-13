@@ -20,7 +20,7 @@ public class PieceFactoryController : MonoBehaviour
         {
             for (int j = 0; j < 4; j++)
             {
-                corrMap[i, j] = i * 4 + j;
+                corrMap[i, j] = j * 4 + i;
             }
         }
         return corrMap;
@@ -44,7 +44,6 @@ public class PieceFactoryController : MonoBehaviour
         List<Sprite> spriteList = new List<Sprite>();
         int ran = Random.Range(0, 3);
         string titlePiece = "NA";
-        picRef = titlePiece;
         switch(ran)
         {
             case 0:
@@ -60,14 +59,14 @@ public class PieceFactoryController : MonoBehaviour
                 spriteList = gayhearts;
                 break;
         }
-        
+        picRef = titlePiece;
         // create pieces and connections
         for (int i = 0; i < spriteList.Capacity; i++)
             {
                 // instantiate w sprite
                 GameObject gam = Instantiate(piecePrefab, new Vector2(), Quaternion.identity);
                 PieceController piece = gam.GetComponent<PieceController>();
-                piece.changeSprite(citybros[i], titlePiece + i.ToString());
+                piece.changeSprite(spriteList[i], titlePiece + i.ToString());
                 // add to list
                 pieces.Add(gam);
             }        
