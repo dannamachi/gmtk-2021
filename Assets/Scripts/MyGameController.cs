@@ -15,6 +15,18 @@ public class MyGameController : MonoBehaviour
     public GameObject safeZoneObj;
     public GameObject bombObj;
 
+    // music stuff
+    public GameObject soundObj;
+    public AudioClip grabSound;
+    public AudioClip bombSound;
+    public AudioClip winSound;
+    public AudioClip warnSound;
+    public AudioClip music1;
+    public AudioClip music2;
+    public AudioClip music3;
+    public GameObject musicObj;
+    int musTrack = 1;
+
     // buttons & overlays
     public Sprite mainSp;
     public Sprite inSp;
@@ -44,12 +56,28 @@ public class MyGameController : MonoBehaviour
     
     // bomb timer
     float bombTime;
-    public float bombInterval = 15.0f;
+    public float bombInterval = 25.0f;
 
     // piece timer stuff
     float releaseTime;
     public float intervalTime = 5.0f;
     string timerText;
+
+    // music
+    void playSound(AudioClip clip)
+    {
+        soundObj.GetComponent<AudioSource>().PlayOneShot(clip);
+    }
+    void playMusic()
+    {
+        AudioSource musicPlay = musicObj.GetComponent<AudioSource>();
+        musTrack++;
+        if (musTrack > 3) musTrack = 1;
+        if (musTrack == 1) musicPlay.clip = music1;
+        else if (musTrack == 2) musicPlay.clip = music2;
+        else if (musTrack == 3) musicPlay.clip = music3;
+        musicPlay.Play();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -128,6 +156,7 @@ public class MyGameController : MonoBehaviour
             gameState = "GAMEPLAY";
             destroyFinished();
             restartGame();
+            playMusic();
         }
     }
     public void onButton2Press()
@@ -156,8 +185,16 @@ public class MyGameController : MonoBehaviour
                 isStart = false;
                 // to end state
                 gameState = "ENDGAME";
-                if (isWin) displayOverlay("Success");
-                else displayOverlay("GameOver");
+                if (isWin)
+                {
+                    displayOverlay("Success");
+                    playSound(winSound);
+                }
+                else 
+                {
+                    displayOverlay("GameOver");
+                    playSound(bombSound);
+                }
                 displayButton("Restart");
                 displayButton("Exit");
                 bombObj.SetActive(false);
@@ -204,6 +241,7 @@ public class MyGameController : MonoBehaviour
                     // warning sound & show safe zone
                     if (bombTime < bombInterval / 2)
                     {
+                        // playSound(warnSound);
                         SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
                         szone.setDisplay(true);
                         szone.setEnabled(true);
@@ -215,6 +253,7 @@ public class MyGameController : MonoBehaviour
                     PlayerController player = playerObj.GetComponent<PlayerController>();
                     if (!player.isSafe())
                     {
+                        playSound(bombSound);
                         // play bomb ani
                         Animator bombAnima = bombObj.GetComponent<Animator>();
                         bombAnima.SetTrigger("Explode");
@@ -409,6 +448,7 @@ public class MyGameController : MonoBehaviour
             if (!entry.Value && Vector2.Distance(entry.Key, piece.getMyPos()) <= 0.4)
             {
                 // snap!
+                playSound(grabSound);
                 piece.setLocation(entry.Key);
                 // fill up slot
                 enSlots.Add(entry.Key);
