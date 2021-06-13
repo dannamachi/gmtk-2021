@@ -17,6 +17,12 @@ public class PieceController : MonoBehaviour
         spriteRenderer.enabled = false;
     }
 
+    // Get sprite for item display
+    public Sprite getSprite()
+    {
+        return spriteRenderer.sprite;
+    }
+
     // Set location
     public void setLocation(Vector2 vec)
     {

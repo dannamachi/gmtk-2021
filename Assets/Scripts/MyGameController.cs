@@ -51,7 +51,10 @@ public class MyGameController : MonoBehaviour
 
                 // randomize location on screen
                 float newX = Random.Range(-4.0f, 4.0f);
-                float newY = Random.Range(-4.0f, 4.0f);
+                float newY;
+                if (newX > 3.0f) newY = Random.Range(-3.0f, 4.0f);
+                else newY = Random.Range(-4.0f, 4.0f);
+
                 newPiece.setLocation(new Vector2(newX, newY));
             }
         }

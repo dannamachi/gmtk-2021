@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    //variable
+    // movement stuff
     Animator anim;
     Rigidbody2D body;
     float hori;
     float vert;
     Vector2 lookDir = new Vector2(1,0);
+
+    // item stuff
+    public GameObject itemDisplayObj;
 
     // Start is called before the first frame update (not called when instantiate)
     void Start()
@@ -21,6 +25,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // movement & movement animation
         hori = Input.GetAxis("Horizontal");
         vert = Input.GetAxis("Vertical");
 
@@ -35,6 +40,14 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("Look X", lookDir.x);
         anim.SetFloat("Look Y", lookDir.y);
         anim.SetFloat("Speed", move.magnitude);
+
+        // pick up piece
+
+        // display piece in hand
+        if (itemDisplayObj != null)
+        {
+            itemDisplayObj.GetComponent<Image>().sprite = null;
+        }
     }
 
     // Update for physics
