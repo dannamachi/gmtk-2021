@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
 
     // item stuff
     public GameObject itemDisplayObj;
+    GameObject pieceDetected;
+    GameObject pieceInHand;
 
     // Start is called before the first frame update (not called when instantiate)
     void Start()
@@ -42,11 +44,50 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("Speed", move.magnitude);
 
         // pick up piece
-
-        // display piece in hand
-        if (itemDisplayObj != null)
+        if(Input.GetKeyDown(KeyCode.Z))
         {
+            pickUp();
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            putDown();
+        }
+    }
+
+    // pick up piece
+    void pickUp()
+    {
+        if (pieceDetected != null)
+        {
+            pieceInHand = pieceDetected;
+            PieceController myPiece = pieceInHand.GetComponent<PieceController>();
+            itemDisplayObj.GetComponent<Image>().sprite = myPiece.getSprite();
+            myPiece.hide();
+        }
+    }
+    void putDown()
+    {
+        if (hasPickUp())
+        {
+            PieceController myPiece = pieceInHand.GetComponent<PieceController>();
             itemDisplayObj.GetComponent<Image>().sprite = null;
+            myPiece.setLocation(transform.position);
+            myPiece.show();
+        }
+    }
+    bool hasPickUp()
+    {
+        return pieceInHand != null;
+    }
+    public void detectPiece(GameObject obj)
+    {
+        pieceDetected = obj;
+    }
+    public void escapePiece(GameObject obj)
+    {
+        if (pieceDetected == obj)
+        {
+            pieceDetected = null;
         }
     }
 

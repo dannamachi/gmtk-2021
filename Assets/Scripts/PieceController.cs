@@ -33,16 +33,24 @@ public class PieceController : MonoBehaviour
     public void enable()
     {
         myEnabled = true;
-        spriteRenderer.enabled = true;
+        show();
     }
     public void disable()
     {
         myEnabled = false;
-        spriteRenderer.enabled = false;
+        hide();
     }
     public bool isEnabled()
     {
         return myEnabled;
+    }
+    public void hide()
+    {
+        spriteRenderer.enabled = false;
+    }
+    public void show()
+    {
+        spriteRenderer.enabled = true;
     }
 
     // Check conn
@@ -115,9 +123,25 @@ public class PieceController : MonoBehaviour
         myName = text;
     }
 
-    // Update is called once per frame
-    void Update()
+    // On collision with other stuff
+    void OnTriggerEnter2D(Collider2D other)
     {
-        
+        // if player hits a piece
+        PlayerController player = other.GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.detectPiece(gameObject);
+            return;
+        }
+    }
+    void OnTriggerExit2D(Collider2D other)
+    {
+        // if player leaves a piece
+        PlayerController player = other.GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.escapePiece(gameObject);
+            return;
+        }
     }
 }

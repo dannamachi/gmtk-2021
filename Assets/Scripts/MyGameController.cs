@@ -31,6 +31,7 @@ public class MyGameController : MonoBehaviour
     {
         if (isStart)
         {
+            // piece generation timer
             timerTextObj.GetComponent<TMPro.TextMeshProUGUI>().text = "Time: " + ((int) releaseTime).ToString();
             if (releaseTime > 0.0f)
             {
