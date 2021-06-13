@@ -13,6 +13,7 @@ public class MyGameController : MonoBehaviour
     public GameObject frameObj;
     public GameObject overlayObj;
     public GameObject safeZoneObj;
+    public GameObject bombObj;
 
     // buttons & overlays
     public Sprite mainSp;
@@ -61,6 +62,8 @@ public class MyGameController : MonoBehaviour
         SafeZoneController szone = safeZoneObj.GetComponent<SafeZoneController>();
         szone.setDisplay(false);
         szone.setEnabled(false);
+        // hide bomb
+        bombObj.SetActive(false);
         // display main
         displayOverlay("Main");
         displayButton("Start");
@@ -157,6 +160,7 @@ public class MyGameController : MonoBehaviour
                 else displayOverlay("GameOver");
                 displayButton("Restart");
                 displayButton("Exit");
+                bombObj.SetActive(false);
             }
             
             // piece generation
@@ -212,6 +216,8 @@ public class MyGameController : MonoBehaviour
                     if (!player.isSafe())
                     {
                         // play bomb ani
+                        Animator bombAnima = bombObj.GetComponent<Animator>();
+                        bombAnima.SetTrigger("Explode");
                         // mix up slotted pieces!
                         wreckMap(getFilledInSlots() / 2);
                     }
@@ -224,10 +230,10 @@ public class MyGameController : MonoBehaviour
                     szone.setDisplay(false);
                     szone.setEnabled(false);
                     // prepare next random safe zone location (+boundary)
-                    float newX = Random.Range(-3.0f, 3.0f);
+                    float newX = Random.Range(-4.0f, 4.0f);
                     float newY;
-                    if (newX > 3.0f) newY = Random.Range(-2.0f, 3.0f);
-                    else newY = Random.Range(-2.0f, 3.0f);
+                    if (newX > 3.0f) newY = Random.Range(-3.0f, 4.0f);
+                    else newY = Random.Range(-4.0f, 4.0f);
                     szone.setLocation(new Vector2(newX, newY));
                     // restart bomb timer
                     bombTime = bombInterval;
@@ -362,9 +368,12 @@ public class MyGameController : MonoBehaviour
         // timer stuff
         releaseTime = intervalTime;
         gameTime = gameMaxTime;
-        bombTime = bombInterval;
         isStart = true;
         isWin = false;
+
+        // bomb stuff
+        bombObj.SetActive(true);
+        bombTime = bombInterval;
     }
     public void postPickUpCheckSlot(PieceController piece)
     {
