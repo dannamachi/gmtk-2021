@@ -5,14 +5,38 @@ using UnityEngine;
 public class PieceController : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
+    bool myEnabled = false;
     // Connections
     string myName;
     Dictionary<string, string> connDict = new Dictionary<string, string>();
 
-    // Start is called before the first frame update
-    void Start()
+    // Start is called when instant
+    void Awake()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        spriteRenderer.enabled = false;
+    }
+
+    // Set location
+    public void setLocation(Vector2 vec)
+    {
+        transform.position = vec;
+    }
+
+    // Enable/disable
+    public void enable()
+    {
+        myEnabled = true;
+        spriteRenderer.enabled = true;
+    }
+    public void disable()
+    {
+        myEnabled = false;
+        spriteRenderer.enabled = false;
+    }
+    public bool isEnabled()
+    {
+        return myEnabled;
     }
 
     // Check conn
@@ -69,11 +93,13 @@ public class PieceController : MonoBehaviour
     // Set conn
     public void setConn(string dirKey, string connName)
     {
-        connDict.Add(dirKey, connName);
+        if (myEnabled)
+            connDict.Add(dirKey, connName);
     }
     public void removeConn(string dirKey)
     {
-        if (connDict.ContainsKey(dirKey)) connDict.Remove(dirKey);
+        if (myEnabled)
+            if (connDict.ContainsKey(dirKey)) connDict.Remove(dirKey);
     }
 
     // Change sprite

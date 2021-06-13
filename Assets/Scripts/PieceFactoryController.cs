@@ -44,7 +44,7 @@ public class PieceFactoryController : MonoBehaviour
     }
 
     // create pieces
-    List<GameObject> createPieceList()
+    public List<GameObject> createPieceList()
     {
         // select random image
         List<GameObject> pieces = new List<GameObject>();
